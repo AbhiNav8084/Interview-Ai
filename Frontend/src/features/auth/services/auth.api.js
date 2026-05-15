@@ -54,7 +54,7 @@ export async function getMe() {
         return response.data
 
     } catch (error) {
-        
+        return null
     }
 
 }
