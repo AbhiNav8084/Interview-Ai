@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useNavigate, Link } from "react-router";
 import { useAuth } from "../hooks/useAuth";
 
@@ -12,8 +12,11 @@ const Register = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        await handleRegister({ username, email, password })
-        useNavigate("/")
+        const registeredUser = await handleRegister({ username, email, password })
+
+        if (registeredUser) {
+            navigate("/")
+        }
     };
 
     if(loading){

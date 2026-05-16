@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router";
 import "../auth.form.scss";
 import { useAuth } from "../hooks/useAuth";
@@ -10,11 +10,34 @@ const Login = () => {
 
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [errorMessage, setErrorMessage] = useState("");
+
+    useEffect(() => {
+        if (!errorMessage) {
+            return
+        }
+
+        const timeoutId = setTimeout(() => {
+            setErrorMessage("")
+        }, 3000)
+
+        return () => {
+            clearTimeout(timeoutId)
+        }
+    }, [errorMessage])
 
     const handleSubmit = async (e) => {
         e.preventDefault()
-        await handleLogin({ email, password })
-        navigate('/')
+        setErrorMessage("")
+
+        const loggedInUser = await handleLogin({ email, password })
+
+        if (loggedInUser) {
+            navigate('/')
+            return
+        }
+
+        setErrorMessage("Invalid email or password. Please try again.")
     };
 
     if(loading){
@@ -23,6 +46,19 @@ const Login = () => {
 
     return (
         <main>
+            {errorMessage && (
+                <div className="auth-popup" role="alert">
+                    <p>{errorMessage}</p>
+                    <button
+                        type="button"
+                        aria-label="Close message"
+                        onClick={() => setErrorMessage("")}
+                    >
+                        &times;
+                    </button>
+                </div>
+            )}
+
             <div className="form-container">
                 <h1>Login</h1>
 

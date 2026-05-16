@@ -30,6 +30,113 @@ $font-stack:     system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Robot
     gap: 2rem;
 }
 
+.profile-menu {
+    position: fixed;
+    top: 2rem;
+    right: 2rem;
+    z-index: 20;
+
+    &__trigger {
+        width: 3rem;
+        height: 3rem;
+        display: grid;
+        place-items: center;
+        color: $accent;
+        background-color: transparent;
+        border: 1px solid transparent;
+        border-radius: 50%;
+        cursor: pointer;
+        transition: background-color 0.2s, border-color 0.2s, color 0.2s, transform 0.2s;
+
+        &:hover,
+        &:focus-visible,
+        &--active {
+            color: #ff4b4b;
+            background-color: rgba($accent, 0.08);
+            border-color: rgba($accent, 0.28);
+            outline: none;
+        }
+
+        &:active {
+            transform: scale(0.96);
+        }
+    }
+
+    &__box {
+        position: absolute;
+        top: calc(100% + 0.75rem);
+        right: 0;
+        width: 220px;
+        min-height: 300px;
+        display: flex;
+        flex-direction: column;
+        padding: 1.25rem 1.15rem;
+        background-color: rgba($bg-page, 0.98);
+        border: 2px solid rgba($text-primary, 0.82);
+        border-radius: 1.35rem;
+        box-shadow: 0 20px 45px rgba(0, 0, 0, 0.35);
+    }
+
+    &__details {
+        display: flex;
+        flex-direction: column;
+        gap: 0.35rem;
+        min-width: 0;
+
+        strong,
+        p {
+            margin: 0;
+            color: $text-primary;
+            font-size: 0.95rem;
+            line-height: 1.35;
+            overflow-wrap: anywhere;
+        }
+
+        p {
+            color: rgba($text-primary, 0.86);
+            margin-bottom: 0.6rem;
+        }
+    }
+
+    &__label {
+        margin-top: 0.25rem;
+        color: $text-muted;
+        font-size: 0.72rem;
+        font-weight: 700;
+        letter-spacing: 0.03em;
+        text-transform: uppercase;
+    }
+
+    &__logout {
+        margin-top: auto;
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 0.55rem;
+        width: 100%;
+        padding: 0.7rem 0;
+        color: $text-primary;
+        background-color: transparent;
+        border: 0;
+        border-top: 1px solid rgba($border-color, 0.8);
+        cursor: pointer;
+        font-family: $font-stack;
+        font-size: 0.95rem;
+        font-weight: 700;
+        transition: color 0.2s;
+
+        svg {
+            color: $accent;
+        }
+
+        &:hover,
+        &:focus-visible {
+            color: $accent;
+            outline: none;
+        }
+    }
+}
+
 // ── Page Header ──────────────────────────────────────────────────────────────
 .page-header {
     text-align: center;

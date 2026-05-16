@@ -1,14 +1,18 @@
-import React, { useState, useRef } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import "../style/home.scss"
 import { useInterview } from '../hooks/useInterview'
 import { useNavigate } from 'react-router'
+import { useAuth } from '../../auth/hooks/useAuth'
 
 const Home = () => {
 
-    const { loading, generateReport,reports } = useInterview()
+    const { loading, generateReport, reports } = useInterview()
+    const { user, handleLogout } = useAuth()
     const [ jobDescription, setJobDescription ] = useState("")
     const [ selfDescription, setSelfDescription ] = useState("")
+    const [ isProfileOpen, setIsProfileOpen ] = useState(false)
     const resumeInputRef = useRef()
+    const profileMenuRef = useRef()
 
     const navigate = useNavigate()
 
@@ -17,6 +21,26 @@ const Home = () => {
         const data = await generateReport({ jobDescription, selfDescription, resumeFile })
         navigate(`/interview/${data._id}`)
     }
+
+    const handleProfileLogout = async () => {
+        await handleLogout()
+        setIsProfileOpen(false)
+        navigate('/login')
+    }
+
+    useEffect(() => {
+        const handleOutsideClick = (event) => {
+            if (profileMenuRef.current && !profileMenuRef.current.contains(event.target)) {
+                setIsProfileOpen(false)
+            }
+        }
+
+        document.addEventListener('mousedown', handleOutsideClick)
+
+        return () => {
+            document.removeEventListener('mousedown', handleOutsideClick)
+        }
+    }, [])
 
     if (loading) {
         return (
@@ -28,6 +52,37 @@ const Home = () => {
 
     return (
         <div className='home-page'>
+            <div className='profile-menu' ref={profileMenuRef}>
+                <button
+                    type='button'
+                    className={`profile-menu__trigger ${isProfileOpen ? 'profile-menu__trigger--active' : ''}`}
+                    aria-label='Open profile menu'
+                    aria-expanded={isProfileOpen}
+                    onClick={() => setIsProfileOpen((current) => !current)}
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21a8 8 0 0 0-16 0" /><circle cx="12" cy="7" r="4" /></svg>
+                </button>
+
+                {isProfileOpen && (
+                    <div className='profile-menu__box'>
+                        <div className='profile-menu__details'>
+                            <span className='profile-menu__label'>Username</span>
+                            <strong>{user?.username || 'User'}</strong>
+                            <span className='profile-menu__label'>Email</span>
+                            <p>{user?.email || 'No email found'}</p>
+                        </div>
+
+                        <button
+                            type='button'
+                            className='profile-menu__logout'
+                            onClick={handleProfileLogout}
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" /><polyline points="16 17 21 12 16 7" /><line x1="21" y1="12" x2="9" y2="12" /></svg>
+                            Logout
+                        </button>
+                    </div>
+                )}
+            </div>
 
             {/* Page Header */}
             <header className='page-header'>
@@ -50,11 +105,12 @@ const Home = () => {
                         </div>
                         <textarea
                             onChange={(e) => { setJobDescription(e.target.value) }}
+                            value={jobDescription}
                             className='panel__textarea'
                             placeholder={`Paste the full job description here...\ne.g. 'Senior Frontend Engineer at Google requires proficiency in React, TypeScript, and large-scale system design...'`}
                             maxLength={5000}
                         />
-                        <div className='char-counter'>0 / 5000 chars</div>
+                        <div className='char-counter'>{jobDescription.length} / 5000 chars</div>
                     </div>
 
                     {/* Vertical Divider */}
@@ -93,6 +149,7 @@ const Home = () => {
                             <label className='section-label' htmlFor='selfDescription'>Quick Self-Description</label>
                             <textarea
                                 onChange={(e) => { setSelfDescription(e.target.value) }}
+                                value={selfDescription}
                                 id='selfDescription'
                                 name='selfDescription'
                                 className='panel__textarea panel__textarea--short'
