@@ -44,6 +44,7 @@ The user signs up or logs in, uploads a resume PDF, enters a job description and
 - Live job description character counter in the report generation form.
 - React context-based state management for auth and interview reports.
 - SCSS-based responsive UI styling.
+- Configurable frontend API URL and backend CORS origin for local or deployed environments.
 
 ## Tech Stack
 
@@ -102,6 +103,7 @@ project_16/
 +-- Frontend/
 |   +-- index.html
 |   +-- package.json
+|   +-- vercel.json
 |   +-- vite.config.js
 |   +-- src/
 |       +-- App.jsx
@@ -148,6 +150,8 @@ Create a `.env` file inside the `Backend` directory:
 MONGO_URI=mongodb://127.0.0.1:27017/ai-interview-prep
 JWT_SECRET=replace_with_a_strong_secret_key
 GOOGLE_GENAI_API_KEY=replace_with_your_google_genai_api_key
+CLIENT_URL=http://localhost:5173
+PORT=3000
 ```
 
 ### 4. Start the Backend Server
@@ -156,7 +160,7 @@ GOOGLE_GENAI_API_KEY=replace_with_your_google_genai_api_key
 npm run dev
 ```
 
-The backend runs on:
+The backend runs on the configured `PORT`, defaulting to:
 
 ```txt
 http://localhost:3000
@@ -173,6 +177,12 @@ npm install
 
 ### 6. Start the Frontend Development Server
 
+Optionally create a `.env` file inside the `Frontend` directory if your backend is not running on the default URL:
+
+```env
+VITE_API_URL=http://localhost:3000
+```
+
 ```bash
 npm run dev
 ```
@@ -185,15 +195,22 @@ http://localhost:5173
 
 ## Environment Variables
 
-The backend requires the following environment variables:
+The backend supports the following environment variables:
 
 | Variable | Required | Description |
 | --- | --- | --- |
 | `MONGO_URI` | Yes | MongoDB connection string. |
 | `JWT_SECRET` | Yes | Secret key used to sign and verify JWT auth tokens. |
 | `GOOGLE_GENAI_API_KEY` | Yes | API key used by the Google GenAI SDK. |
+| `CLIENT_URL` | No | Comma-separated list of allowed frontend origins for CORS. Defaults to `http://localhost:5173`. |
+| `PORT` | No | Backend server port. Defaults to `3000`. |
+| `NODE_ENV` | No | Enables production cookie settings when set to `production`. |
 
-The frontend currently uses `http://localhost:3000` as the API base URL inside the Axios service files.
+The frontend supports the following environment variable:
+
+| Variable | Required | Description |
+| --- | --- | --- |
+| `VITE_API_URL` | No | Backend API origin used by Axios. Defaults to `http://localhost:3000`. |
 
 ## Available Scripts
 
@@ -204,6 +221,7 @@ Run from the `Backend` directory.
 | Command | Description |
 | --- | --- |
 | `npm run dev` | Starts the Express server using Nodemon through `npx nodemon server.js`. |
+| `npm start` | Starts the Express server with Node. |
 | `npm test` | Placeholder test script. Tests are not configured yet. |
 
 ### Frontend
@@ -352,8 +370,8 @@ Requires authentication. Returns a generated resume PDF for the selected intervi
 
 Before deploying this project, review the following:
 
-- Move hard-coded API URLs and CORS origins into environment variables.
-- Set secure cookie options in production, including `httpOnly`, `secure`, and `sameSite`.
+- Configure `CLIENT_URL` and `VITE_API_URL` for the deployed frontend and backend URLs.
+- Set `NODE_ENV=production` so auth cookies use production cookie options.
 - Add global error handling middleware for consistent API errors.
 - Add request validation for auth and interview inputs.
 - Add file type validation so only supported resume formats are accepted.
@@ -364,13 +382,11 @@ Before deploying this project, review the following:
 - Configure a production process manager or deployment platform for the backend.
 - Use a managed MongoDB database for production.
 - Store all secrets in the deployment provider's secret manager.
+- Keep `Frontend/vercel.json` when deploying the SPA to Vercel so client-side routes rewrite to `index.html`.
 
 ## Known Limitations
 
 - Tests are not configured yet.
-- The backend runs on port `3000` directly in `server.js`.
-- The frontend API base URL is hard-coded to `http://localhost:3000`.
-- The backend CORS origin is hard-coded to `http://localhost:5173`.
 - Resume upload is limited to 3 MB by the backend middleware.
 - Resume upload is required by the current backend controller because it reads `req.file.buffer`.
 - The current backend PDF parser expects PDF input, even though the frontend upload label also mentions DOCX.
