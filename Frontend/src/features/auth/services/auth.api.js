@@ -41,8 +41,8 @@ export async function logout() {
     try {
         const response = await api.get('/api/auth/logout')
         return response.data
-    } catch (error) {
-
+    } catch {
+        return null
     }
 }
 
@@ -53,7 +53,7 @@ export async function getMe() {
 
         return response.data
 
-    } catch (error) {
+    } catch {
         return null
     }
 

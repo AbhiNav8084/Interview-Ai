@@ -1,4 +1,6 @@
 // ── Variables ────────────────────────────────────────────────────────────────
+@use "sass:color";
+
 $bg-page:        #0d1117;
 $bg-card:        #161b22;
 $bg-panel:       #1c2230;
@@ -28,6 +30,7 @@ $font-stack:     system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Robot
     justify-content: center;
     padding: 3rem 1.5rem;
     gap: 2rem;
+    overflow-x: hidden;
 }
 
 .profile-menu {
@@ -140,12 +143,14 @@ $font-stack:     system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Robot
 // ── Page Header ──────────────────────────────────────────────────────────────
 .page-header {
     text-align: center;
+    width: min(100%, 760px);
 
     h1 {
-        font-size: 2.25rem;
+        font-size: clamp(2rem, 5vw, 2.25rem);
         font-weight: 700;
         margin-bottom: 0.5rem;
         color: $text-primary;
+        line-height: 1.12;
     }
 
     p {
@@ -198,6 +203,7 @@ $font-stack:     system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Robot
 
 .panel {
     flex: 1;
+    min-width: 0;
     display: flex;
     flex-direction: column;
     gap: 1rem;
@@ -226,6 +232,7 @@ $font-stack:     system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Robot
     &__textarea {
         flex: 1;
         width: 100%;
+        min-height: 240px;
         background-color: $bg-input;
         border: 1px solid $border-color;
         border-radius: 0.5rem;
@@ -249,6 +256,7 @@ $font-stack:     system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Robot
         &--short {
             flex: unset;
             height: 96px;
+            min-height: 96px;
         }
     }
 
@@ -337,6 +345,7 @@ $font-stack:     system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Robot
         font-weight: 500;
         color: $text-primary;
         margin: 0;
+        text-align: center;
     }
 
     &__subtitle {
@@ -408,7 +417,7 @@ $font-stack:     system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Robot
     align-items: center;
     gap: 0.5rem;
     padding: 0.75rem 1.5rem;
-    background: linear-gradient(135deg, $accent 0%, darken($accent, 10%) 100%);
+    background: linear-gradient(135deg, $accent 0%, color.adjust($accent, $lightness: -10%) 100%);
     color: #fff;
     font-size: 0.9rem;
     font-weight: 600;
@@ -417,6 +426,8 @@ $font-stack:     system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Robot
     cursor: pointer;
     transition: opacity 0.2s, transform 0.1s;
     font-family: $font-stack;
+    min-height: 44px;
+    justify-content: center;
 
     &:hover {
         opacity: 0.9;
@@ -435,9 +446,9 @@ $font-stack:     system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Robot
     max-width: 900px;
 
     .reports-list{
-        display: flex;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
         gap: 0.75rem;
-        flex-wrap: wrap;
 
         .report-item{
             background-color: $bg-card;
@@ -466,6 +477,8 @@ $font-stack:     system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Robot
 .page-footer {
     display: flex;
     gap: 1.5rem;
+    flex-wrap: wrap;
+    justify-content: center;
 
     a {
         font-size: 0.8rem;
@@ -476,5 +489,150 @@ $font-stack:     system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Robot
         &:hover {
             color: $text-primary;
         }
+    }
+}
+
+@media (max-width: 900px) {
+    .home-page {
+        justify-content: flex-start;
+        padding: 5.5rem 1.25rem 2rem;
+    }
+
+    .profile-menu {
+        top: 1.25rem;
+        right: 1.25rem;
+    }
+
+    .interview-card {
+        max-width: 720px;
+
+        &__body {
+            flex-direction: column;
+            min-height: 0;
+        }
+
+        &__footer {
+            gap: 1rem;
+        }
+    }
+
+    .panel-divider {
+        width: 100%;
+        height: 1px;
+    }
+
+    .panel {
+        &__textarea {
+            min-height: 220px;
+        }
+
+        &--left {
+            .char-counter {
+                position: static;
+                align-self: flex-end;
+                margin-top: -0.65rem;
+            }
+        }
+    }
+}
+
+@media (max-width: 640px) {
+    .home-page {
+        padding: 5rem 1rem 1.5rem;
+        gap: 1.35rem;
+    }
+
+    .profile-menu {
+        top: 0.9rem;
+        right: 0.9rem;
+
+        &__trigger {
+            width: 2.75rem;
+            height: 2.75rem;
+        }
+
+        &__box {
+            width: min(260px, calc(100vw - 2rem));
+            min-height: 250px;
+            border-radius: 1rem;
+        }
+    }
+
+    .page-header {
+        text-align: left;
+
+        h1 {
+            font-size: clamp(1.85rem, 10vw, 2.25rem);
+        }
+
+        p {
+            margin: 0;
+            font-size: 0.9rem;
+        }
+    }
+
+    .interview-card {
+        border-radius: 0.85rem;
+
+        &__footer {
+            flex-direction: column;
+            align-items: stretch;
+            padding: 1rem;
+
+            .footer-info {
+                text-align: center;
+            }
+        }
+    }
+
+    .panel {
+        padding: 1rem;
+
+        &__header {
+            align-items: flex-start;
+            flex-wrap: wrap;
+
+            h2 {
+                min-width: calc(100% - 2rem);
+            }
+        }
+
+        &__textarea {
+            min-height: 200px;
+            font-size: 0.9rem;
+        }
+    }
+
+    .section-label {
+        align-items: flex-start;
+        flex-wrap: wrap;
+    }
+
+    .dropzone {
+        padding: 1.25rem 0.8rem;
+    }
+
+    .info-box {
+        padding: 0.75rem;
+    }
+
+    .generate-btn {
+        width: 100%;
+        padding-inline: 1rem;
+        text-align: center;
+    }
+
+    .recent-reports {
+        h2 {
+            font-size: 1.15rem;
+        }
+
+        .reports-list {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .page-footer {
+        gap: 0.75rem 1.25rem;
     }
 }

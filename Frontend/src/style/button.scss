@@ -5,6 +5,7 @@
     padding-block: 0.75rem;
     border-radius: 1rem;
     cursor: pointer;
+    min-height: 44px;
 
     transition: all 0.3s ease-in-out;
 
@@ -17,4 +18,11 @@
         transform: scale(0.9);
     }
 
+}
+
+@media (max-width: 640px) {
+    .button {
+        width: 100%;
+        padding-inline: 1rem;
+    }
 }
