@@ -222,7 +222,7 @@ const generatePdfFromHtml = async (htmlContent) => {
   return pdfBuffer;
 };
 
-// genereating resume report with puppeteer
+// generating resume report with puppeteer
 
 const generateResumePdf = async ({
   jobDescription,
