@@ -69,9 +69,12 @@ export const useInterview = () => {
             link.setAttribute("download", `resume_${interviewReportId}.pdf`)
             document.body.appendChild(link)
             link.click()
+            link.remove()
+            window.URL.revokeObjectURL(url)
         }
         catch (error) {
             console.log(error)
+            alert(error.response?.data?.message || "Could not download resume. Please try again.")
         } finally {
             setLoading(false)
         }

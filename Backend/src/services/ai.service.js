@@ -1,7 +1,6 @@
 const { GoogleGenAI } = require("@google/genai");
 const { z } = require("zod");
 const puppeteer = require("puppeteer");
-const { zodToJsonSchema } = require("zod-to-json-schema");
 
 const ai = new GoogleGenAI({
   apiKey: process.env.GOOGLE_GENAI_API_KEY,
@@ -210,16 +209,26 @@ ${selfDescription}
 // using puppeteer
 
 const generatePdfFromHtml = async (htmlContent) => {
-  const browser = await puppeteer.launch();
-  const page = await browser.newPage();
-  await page.setContent(htmlContent, { waitUntil: "networkidle0" });
-  const pdfBuffer = await page.pdf({
-    format: "A4",
-    margin: { top: "20mm", bottom: "20mm", left: "15mm", right: "15mm" },
-  });
-  await browser.close();
+  let browser;
 
-  return pdfBuffer;
+  try {
+    browser = await puppeteer.launch({
+      args: ["--no-sandbox", "--disable-setuid-sandbox"],
+    });
+    const page = await browser.newPage();
+    await page.setContent(htmlContent, { waitUntil: "networkidle0" });
+    const pdfBuffer = await page.pdf({
+      format: "A4",
+      printBackground: true,
+      margin: { top: "20mm", bottom: "20mm", left: "15mm", right: "15mm" },
+    });
+
+    return pdfBuffer;
+  } finally {
+    if (browser) {
+      await browser.close();
+    }
+  }
 };
 
 // generating resume report with puppeteer
@@ -229,13 +238,18 @@ const generateResumePdf = async ({
   resume,
   selfDescription,
 }) => {
-  const resumePdfSchema = z.object({
-    html: z
-      .string()
-      .describe(
-        "HTML content of the resume which can be converted to pdf using any library like puppeteer",
-      ),
-  });
+  const resumePdfJsonSchema = {
+    type: "object",
+    properties: {
+      html: {
+        type: "string",
+        description:
+          "Complete HTML content of the resume, ready to convert to PDF with Puppeteer",
+      },
+    },
+    required: ["html"],
+  };
+
   const prompt = `Generate resume for a candidate with the following details:
                         Resume: ${resume}
                         Self Description: ${selfDescription}
@@ -253,10 +267,15 @@ const generateResumePdf = async ({
     contents: prompt,
     config: {
       responseMimeType: "application/json",
-      responseJsonSchema: zodToJsonSchema(resumePdfSchema),
+      responseJsonSchema: resumePdfJsonSchema,
     },
   });
   const jsonContent = JSON.parse(response.text);
+
+  if (!jsonContent.html) {
+    throw new Error("AI response did not include resume HTML.");
+  }
+
   const pdfBuffer = await generatePdfFromHtml(jsonContent.html);
   return pdfBuffer;
 };
